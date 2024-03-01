@@ -1,7 +1,12 @@
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from user.serializers import UserCreateSerializer, UserProfileSerializer
+from user.models import UserProfile
+from user.serializers import (
+    UserCreateSerializer,
+    UserProfileSerializer,
+    UserProfileUpdateSerializer,
+)
 
 
 class UserCreateView(CreateAPIView):
@@ -13,4 +18,13 @@ class UserProfileCreateView(CreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
-        return self.request.user
+        serializer.save(user=self.request.user)
+
+
+class UserProfileUpdateView(RetrieveUpdateAPIView):
+    serializer_class = UserProfileUpdateSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        email = self.request.user.email
+        return UserProfile.objects.get(user__email=email)
