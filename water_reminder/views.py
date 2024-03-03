@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 
-from app.settings import API_KEY, CITY
+from app.settings import API_KEY
 from water_reminder.models import Water
 from water_reminder.serializers import (
     WaterIntakeSerializer,
@@ -14,21 +14,25 @@ from water_reminder.serializers import (
 )
 
 
-class DashboardView(APIView):
-    def get(self, request):
-        water = Water.objects.get(user=request.user)
-        water_serializer = WaterIntakeSerializer(instance=water)
+class WeatherDataFetcher:
+    @staticmethod
+    def get_current_location():
+        """Return current city with using 'ipinfo.io' by IP"""
+        url = "http://ipinfo.io/json"
+        response = requests.get(url).json()
 
-        weather_data = self.get_weather_data()
-        processed_weather_data = self.process_weather_data(weather_data)
+        return response["city"]
 
-        if processed_weather_data:
-            weather_serializer = WeatherSerializer(instance=processed_weather_data)
-
-        return Response(
-            {"water_intake": water_serializer.data, "weather": weather_serializer.data},
-            status=status.HTTP_200_OK,
+    @staticmethod
+    def get_weather_data():
+        """Extract weather data from 'api.weatherapi.com' API"""
+        city = WeatherDataFetcher.get_current_location()
+        response = requests.get(
+            f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={city}&aqi=no"
         )
+        response.raise_for_status()
+
+        return response.json()
 
     @staticmethod
     def process_weather_data(weather_data):
@@ -50,14 +54,22 @@ class DashboardView(APIView):
 
         return None
 
-    @staticmethod
-    def get_weather_data():
-        """Extract weather data from 'api.weatherapi.com' API"""
-        response = requests.get(
-            f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={CITY}&aqi=no"
+
+class DashboardView(APIView):
+    def get(self, request):
+        water = Water.objects.get(user=request.user)
+        water_serializer = WaterIntakeSerializer(instance=water)
+
+        weather_data = WeatherDataFetcher.get_weather_data()
+        processed_weather_data = WeatherDataFetcher.process_weather_data(weather_data)
+
+        if processed_weather_data:
+            weather_serializer = WeatherSerializer(instance=processed_weather_data)
+
+        return Response(
+            {"water_intake": water_serializer.data, "weather": weather_serializer.data},
+            status=status.HTTP_200_OK,
         )
-        response.raise_for_status()
-        return response.json()
 
 
 class WaterView(RetrieveUpdateAPIView):
