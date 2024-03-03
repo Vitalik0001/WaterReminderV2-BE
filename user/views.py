@@ -14,13 +14,17 @@ from water_reminder.models import Water
 
 
 class CalculateWaterIntake:
-    WATER_PER_KG = 0.03
 
     def __init__(self, profile_instance):
         self.profile_instance = profile_instance
 
     def calculate_water_intake_goal(self):
         """Calculate water intake goal for user appropriate their parameters"""
+
+        gender_multiplier = {
+            "M": 0.04,
+            "F": 0.03
+        }
 
         activity_multiplier = {
             "M": 1.0,
@@ -32,7 +36,7 @@ class CalculateWaterIntake:
 
         water_intake = (
                 self.profile_instance.weight
-                * self.WATER_PER_KG
+                * gender_multiplier[self.profile_instance.gender]
                 * activity_multiplier[self.profile_instance.activity]
         )
 
