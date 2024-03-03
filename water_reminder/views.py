@@ -1,12 +1,17 @@
+import requests
 from urllib.parse import urljoin
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import requests
+from rest_framework.generics import RetrieveUpdateAPIView
 
 from app.settings import API_KEY, CITY
 from water_reminder.models import Water
-from water_reminder.serializers import WaterIntakeSerializer, WeatherSerializer
+from water_reminder.serializers import (
+    WaterIntakeSerializer,
+    WeatherSerializer,
+    WaterSerializer,
+)
 
 
 class DashboardView(APIView):
@@ -53,3 +58,10 @@ class DashboardView(APIView):
         )
         response.raise_for_status()
         return response.json()
+
+
+class WaterView(RetrieveUpdateAPIView):
+    serializer_class = WaterSerializer
+
+    def get_object(self):
+        return Water.objects.get(user=self.request.user)
