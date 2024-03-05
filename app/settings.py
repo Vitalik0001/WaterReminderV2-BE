@@ -35,9 +35,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "rest_framework_simplejwt",
+    "debug_toolbar",
     "rest_framework",
-    "django_crontab",
+
     "water_reminder",
     "user",
 
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -74,6 +77,10 @@ TEMPLATES = [
 WSGI_APPLICATION = "app.wsgi.application"
 
 AUTH_USER_MODEL = "user.User"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

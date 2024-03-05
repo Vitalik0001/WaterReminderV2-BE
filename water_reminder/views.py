@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import urljoin
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -57,7 +58,7 @@ class WeatherDataFetcher:
 
 class DashboardView(APIView):
     def get(self, request):
-        water = Water.objects.get(user=request.user)
+        water = Water.objects.select_related("user").get(user=request.user)
         water_serializer = WaterIntakeSerializer(instance=water)
 
         weather_data = WeatherDataFetcher.get_weather_data()
@@ -76,4 +77,8 @@ class WaterView(RetrieveUpdateAPIView):
     serializer_class = WaterSerializer
 
     def get_object(self):
-        return Water.objects.get(user=self.request.user)
+        water_instance = Water.objects.prefetch_related("water_logs").get(
+            user=self.request.user
+        )
+
+        return water_instance
