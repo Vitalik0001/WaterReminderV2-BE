@@ -36,7 +36,7 @@ class WeatherDataFetcher:
 
     @staticmethod
     def process_weather_data(weather_data):
-        """ Process raw weather data into a more structured format."""
+        """Process raw weather data into a more structured format."""
         if weather_data:
             temperature = round(weather_data["current"]["temp_c"])
             condition = weather_data["current"]["condition"]["text"]

@@ -6,6 +6,28 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext as _
 
 
+def get_profile_image_path(instance):
+    """Return image path depends on user age and gender"""
+    gender_mapping = {
+        "M": "male",
+        "F": "female",
+    }
+
+    gender = gender_mapping.get(instance.gender)
+
+    if 5 <= instance.age <= 18:
+        return f"profile_image/{gender}/childhood.jpg"
+
+    elif 19 <= instance.age <= 39:
+        return f"profile_image/{gender}/young_adulthood.jpg"
+
+    elif 40 <= instance.age <= 64:
+        return f"profile_image/{gender}/middle_adulthood.jpg"
+
+    elif 65 <= instance.age <= 120:
+        return f"profile_image/{gender}/older_adulthood.jpg"
+
+
 class CustomUserManager(BaseUserManager):
     """
     Custom user model manager where email is the unique identifiers
@@ -67,6 +89,7 @@ class UserProfile(models.Model):
         ("M", _("Male")),
         ("F", _("Female")),
     )
+    profile_image = models.ImageField()
     gender = models.CharField(_("gender"), max_length=1, choices=GENDER_CHOICES)
     name = models.CharField(_("name"), max_length=30)
     age = models.IntegerField(
@@ -79,3 +102,12 @@ class UserProfile(models.Model):
         _("height"), validators=[MinValueValidator(100), MaxValueValidator(220)]
     )
     activity = models.CharField(_("activity"), max_length=1, choices=ACTIVITY_CHOICES)
+
+    def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        self.profile_image = get_profile_image_path(self)
+
+        super().save(
+            force_insert=False, force_update=False, using=None, update_fields=None
+        )
