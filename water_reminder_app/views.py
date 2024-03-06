@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 
-from app.settings import API_KEY
-from water_reminder.models import Water
-from water_reminder.serializers import (
+from water_reminder.settings import API_KEY
+from water_reminder_app.models import Water
+from water_reminder_app.serializers import (
     WaterIntakeSerializer,
     WeatherSerializer,
     WaterSerializer,

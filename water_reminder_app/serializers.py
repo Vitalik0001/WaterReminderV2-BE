@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from water_reminder.models import Water, WaterLog
+from water_reminder_app.models import Water, WaterLog
 
 
 class WaterLogSerializer(serializers.ModelSerializer):

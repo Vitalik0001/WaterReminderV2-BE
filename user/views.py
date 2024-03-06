@@ -11,7 +11,7 @@ from user.serializers import (
     UserProfileSerializer,
     UserProfileUpdateSerializer,
 )
-from water_reminder.models import Water
+from water_reminder_app.models import Water
 
 
 class CalculateWaterIntake:
