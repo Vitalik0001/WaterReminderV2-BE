@@ -1,7 +1,8 @@
 import requests
-from urllib.parse import urljoin
 
 from rest_framework import status
+from urllib.parse import urljoin
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
@@ -58,7 +59,9 @@ class WeatherDataFetcher:
 
 class DashboardView(APIView):
     def get(self, request):
-        water = Water.objects.select_related("user").get(user=request.user)
+        water = get_object_or_404(
+            Water.objects.select_related("user"), user=request.user
+        )
         water_serializer = WaterIntakeSerializer(instance=water)
 
         weather_data = WeatherDataFetcher.get_weather_data()

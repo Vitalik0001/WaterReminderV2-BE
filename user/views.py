@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -21,10 +22,7 @@ class CalculateWaterIntake:
     def calculate_water_intake_goal(self):
         """Calculate water intake goal for user appropriate their parameters"""
 
-        gender_multiplier = {
-            "M": 0.04,
-            "F": 0.03
-        }
+        gender_multiplier = {"M": 0.04, "F": 0.03}
 
         activity_multiplier = {
             "M": 1.0,
@@ -35,9 +33,9 @@ class CalculateWaterIntake:
         }
 
         water_intake = (
-                self.profile_instance.weight
-                * gender_multiplier[self.profile_instance.gender]
-                * activity_multiplier[self.profile_instance.activity]
+            self.profile_instance.weight
+            * gender_multiplier[self.profile_instance.gender]
+            * activity_multiplier[self.profile_instance.activity]
         )
 
         rounded_water_intake = round(water_intake * 1000)
@@ -72,7 +70,7 @@ class UserProfileUpdateView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        user_profile = UserProfile.objects.get(user=request.user)
+        user_profile = get_object_or_404(UserProfile.objects, user=request.user)
         serializer = self.serializer_class(instance=user_profile)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -80,7 +78,9 @@ class UserProfileUpdateView(APIView):
     def patch(self, request):
         """Lists water intake if user update his weight or activity"""
         user_profile = UserProfile.objects.get(user=request.user)
-        serializer = self.serializer_class(user_profile, data=request.data, partial=True)
+        serializer = self.serializer_class(
+            user_profile, data=request.data, partial=True
+        )
 
         activity_before = user_profile.activity
         weight_before = user_profile.weight
