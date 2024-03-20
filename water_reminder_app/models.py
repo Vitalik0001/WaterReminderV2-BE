@@ -1,6 +1,16 @@
+import os
+import uuid
+
+from django.utils.text import slugify
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+
+
+def get_tip_image(instance, file_name):
+    _, extension = os.path.splitext(file_name)
+    file_path = f"{slugify(instance.name)}-{uuid.uuid4()}.{extension}"
+    return os.path.join("uploads/tips/", file_path)
 
 
 class Water(models.Model):
@@ -60,3 +70,9 @@ class WaterLog(models.Model):
     )
     intake = models.IntegerField()
     intaked_time = models.TimeField(auto_now_add=True)
+
+
+class GidrationTip(models.Model):
+    name = models.CharField(max_length=63)
+    description = models.TextField()
+    image = models.ImageField(upload_to=get_tip_image)

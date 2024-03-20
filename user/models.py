@@ -79,18 +79,18 @@ class UserProfile(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profiles"
     )
     ACTIVITY_CHOICES = (
-        ("M", _("Minimal")),
-        ("L", _("Low")),
-        ("A", _("Average")),
-        ("H", _("High")),
-        ("V", _("Very high")),
+        ("Minimal", _("Minimal")),
+        ("Low", _("Low")),
+        ("Average", _("Average")),
+        ("High", _("High")),
+        ("Very high", _("Very high")),
     )
     GENDER_CHOICES = (
-        ("M", _("Male")),
-        ("F", _("Female")),
+        ("Male", _("Male")),
+        ("Female", _("Female")),
     )
     profile_image = models.ImageField()
-    gender = models.CharField(_("gender"), max_length=1, choices=GENDER_CHOICES)
+    gender = models.CharField(_("gender"), max_length=6, choices=GENDER_CHOICES)
     name = models.CharField(_("name"), max_length=30)
     age = models.IntegerField(
         _("age"), validators=[MinValueValidator(5), MaxValueValidator(120)]
@@ -101,7 +101,7 @@ class UserProfile(models.Model):
     height = models.IntegerField(
         _("height"), validators=[MinValueValidator(100), MaxValueValidator(220)]
     )
-    activity = models.CharField(_("activity"), max_length=1, choices=ACTIVITY_CHOICES)
+    activity = models.CharField(_("activity"), max_length=9, choices=ACTIVITY_CHOICES)
 
     def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
