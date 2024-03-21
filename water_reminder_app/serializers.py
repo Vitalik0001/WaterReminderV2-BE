@@ -1,12 +1,45 @@
 from rest_framework import serializers
 
-from water_reminder_app.models import Water, WaterLog
+from water_reminder_app.models import (
+    Water,
+    WaterLog,
+    GidrationTip
+)
+
+
+class GidrationTipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GidrationTip
+        fields = ("id", "name", "description", "image")
 
 
 class WaterLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = WaterLog
         fields = ("intake", "intaked_time")
+
+
+class WaterSerializer(serializers.ModelSerializer):
+    water_logs = WaterLogSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Water
+        fields = (
+            "id",
+            "daily_intake",
+            "intake_goal",
+            "intake_achieved",
+            "intake_status_percentage",
+            "current_water_intake",
+            "water_logs",
+        )
+        read_only_fields = (
+            "id",
+            "daily_intake",
+            "intake_goal",
+            "intake_achieved",
+            "intake_status_percentage",
+        )
 
 
 class WeatherSerializer(serializers.Serializer):
@@ -32,27 +65,4 @@ class WaterIntakeSerializer(serializers.ModelSerializer):
             "intake_achieved",
             "days",
             "water_logs",
-        )
-
-
-class WaterSerializer(serializers.ModelSerializer):
-    water_logs = WaterLogSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Water
-        fields = (
-            "id",
-            "daily_intake",
-            "intake_goal",
-            "intake_achieved",
-            "intake_status_percentage",
-            "current_water_intake",
-            "water_logs",
-        )
-        read_only_fields = (
-            "id",
-            "daily_intake",
-            "intake_goal",
-            "intake_achieved",
-            "intake_status_percentage",
         )
