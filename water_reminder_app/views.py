@@ -1,3 +1,4 @@
+import random
 import requests
 
 from rest_framework import status
@@ -8,12 +9,22 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 
 from water_reminder.settings import API_KEY
-from water_reminder_app.models import Water
+from water_reminder_app.models import Water, GidrationTip
 from water_reminder_app.serializers import (
     WaterIntakeSerializer,
     WeatherSerializer,
     WaterSerializer,
+    GidrationTipSerializer,
 )
+
+
+def get_three_gidration_tips():
+    """Return a queryset containing three randomly selected gidration tips"""
+    pks = GidrationTip.objects.values_list("pk", flat=True)
+    random_pk_list = [random.choice(pks) for _ in range(3)]
+    gidration_tips = GidrationTip.objects.filter(id__in=random_pk_list)
+
+    return gidration_tips
 
 
 class WeatherDataFetcher:
@@ -64,6 +75,9 @@ class DashboardView(APIView):
         )
         water_serializer = WaterIntakeSerializer(instance=water)
 
+        gidration_tips = get_three_gidration_tips()
+        gidration_tips_serializer = GidrationTipSerializer(gidration_tips, many=True)
+
         weather_data = WeatherDataFetcher.get_weather_data()
         processed_weather_data = WeatherDataFetcher.process_weather_data(weather_data)
 
@@ -71,7 +85,11 @@ class DashboardView(APIView):
             weather_serializer = WeatherSerializer(instance=processed_weather_data)
 
         return Response(
-            {"water_intake": water_serializer.data, "weather": weather_serializer.data},
+            {
+                "water_intake": water_serializer.data,
+                "weather": weather_serializer.data,
+                "gidration_tips": gidration_tips_serializer.data,
+            },
             status=status.HTTP_200_OK,
         )
 
